@@ -1,5 +1,7 @@
 package com.ark.android.weatherapp.data.exception;
 
+import com.google.gson.JsonSyntaxException;
+
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -90,7 +92,7 @@ public class AppException extends Exception {
 			return new AppException(AppException.OBJECT_INSTANTIATION_EXCEPTION);
 		} else if (e instanceof IOException) {
 			return new AppException(AppException.NETWORK_EXCEPTION);
-		} else if (e instanceof JSONException) {
+		} else if (e instanceof JSONException || e instanceof JsonSyntaxException) {
 			return new AppException(AppException.JSON_PARSING_EXCEPTION);
 		} else if (e instanceof ParseException) {
 			return new AppException(AppException.DATE_PARSING_EXCEPTION);

@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">WeatherApp</string>
+    <string name="pick_location">Pick Location</string>
+    <string name="choosedLocation">Choosed location</string>
+    <string name="locationDenied">App can\'t get your location please go to settings and enable it</string>
+    <string name="allowLocation">Please allow access to your location to get near by</string>
+    <string name="done">Done</string>
+    <string name="addBookmark">Add Bookmark</string>
+    <string name="bookmarkName">Bookmark Name</string>
+    <string name="no_name_provided">Please enter a valid name</string>
+    <string name="no_location_provide">Please select a location</string>
+    <string name="baseUrl">http://api.openweathermap.org/data/2.5</string>
+    <string name="defaultCity">London</string>
+    <string name="locationFail">Sorry couldn\'t obtain your location</string>
+    <string name="userLocation">Current location</string>
 </resources>

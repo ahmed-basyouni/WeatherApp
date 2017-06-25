@@ -7,7 +7,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- *
+ * A Network Dispatcher class that take a url and return json result
+ * it doesn't know any information about our app and it through any exception to caller class
  * Created by ahmedb on 6/24/2017.
  */
 

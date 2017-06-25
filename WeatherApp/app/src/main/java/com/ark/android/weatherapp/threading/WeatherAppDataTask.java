@@ -11,9 +11,14 @@ import com.ark.android.weatherapp.data.parsing.ParsingManager;
 import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
+import java.util.concurrent.Executor;
 
 /**
- *
+ * A Threading class that help us make all our network calls in background
+ * I was going to use {@link java.util.concurrent.ExecutorService} to handle thread pool depending on different devices
+ * but since our minApi is above 11 we can use {@link AsyncTask#executeOnExecutor(Executor, Object[])} which will use the
+ * thread pool which already implemented inside {@link AsyncTask} and since all our calling will take only a few seconds
+ * it seems that we didn't break any restrictions as stated in {@link AsyncTask} documentations
  * Created by Ark on 6/24/2017.
  */
 

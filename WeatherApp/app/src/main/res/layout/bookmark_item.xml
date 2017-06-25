@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/smallMargin"
+    card_view:cardBackgroundColor="@android:color/white"
+    card_view:cardElevation="3dp"
+    card_view:cardCornerRadius="5dp"
+    android:background="@drawable/rounded_corner_bg">
+
+    <ImageView
+        android:id="@+id/timeImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/day_clearsky"
+        android:scaleType="centerCrop"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/smallMargin"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_bookmark_border_white_24dp"
+            android:id="@+id/defaultBookmark"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/bookmarkTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/smallMargin"
+                tools:text="Title"
+                android:textSize="@dimen/textSizeLarge"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/bookmarkGeoAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="GeoAddress"
+                android:layout_margin="@dimen/smallMargin"
+                android:textSize="@dimen/textSizeMedium"
+                android:textColor="@android:color/white"/>
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:id="@+id/retry"
+            android:src="@drawable/ic_refresh_black_24dp"
+            android:background="@android:color/transparent"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/smallMargin"
+                android:id="@+id/degree"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/verylarge"
+                tools:text="30"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/weatherTitle"
+                android:textSize="@dimen/textSizeMedium"
+                android:textColor="@android:color/white"
+                android:layout_margin="@dimen/smallMargin"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

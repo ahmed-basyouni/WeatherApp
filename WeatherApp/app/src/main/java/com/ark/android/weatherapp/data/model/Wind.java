@@ -20,4 +20,5 @@ public class Wind {
     public void setSpeed(Double speed) {
         this.speed = speed;
     }
+
 }

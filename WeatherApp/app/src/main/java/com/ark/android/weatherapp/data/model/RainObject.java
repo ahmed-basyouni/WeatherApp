@@ -19,4 +19,5 @@ public class RainObject {
     public void setRainVolume(Double rainVolume) {
         this.rainVolume = rainVolume;
     }
+
 }

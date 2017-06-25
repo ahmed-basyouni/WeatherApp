@@ -4,6 +4,7 @@ import com.ark.android.weatherapp.data.exception.AppException;
 import com.ark.android.weatherapp.data.model.BaseModel;
 
 /**
+ * A network listener that connect {@link com.ark.android.weatherapp.manager.BaseManager} and it's childes
  * Created by Ark on 6/24/2017.
  */
 

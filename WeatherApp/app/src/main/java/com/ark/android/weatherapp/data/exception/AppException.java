@@ -7,7 +7,11 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.text.ParseException;
 
-
+/**
+ * A custom Exception class to handle most common Exceptions that WeaterApp may face
+ * including some future cases like force update Exception
+ * Created by Ark on 6/24/2017.
+ */
 public class AppException extends Exception {
 
 	private static final long serialVersionUID = 6605821659085061135L;

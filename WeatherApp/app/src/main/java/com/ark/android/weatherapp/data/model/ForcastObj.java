@@ -3,13 +3,14 @@ package com.ark.android.weatherapp.data.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Ark on 6/24/2017.
  */
 
-public class ForcastObj extends BaseModel{
+public class ForcastObj extends BaseModel implements Serializable {
 
     @SerializedName("list")
     @Expose

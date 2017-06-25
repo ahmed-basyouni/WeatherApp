@@ -1,11 +1,13 @@
 package com.ark.android.weatherapp.data.model;
 
+import java.io.Serializable;
+
 /**
  * BookmarkObject that is used through out our app and in inserting and retrieving from dataBase
  * Created by Ark on 6/24/2017.
  */
 
-public class BookMarksObject extends BaseModel{
+public class BookMarksObject extends BaseModel implements Serializable{
     private String title;
     private String geoAddress;
     private long id;

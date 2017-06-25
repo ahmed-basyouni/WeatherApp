@@ -43,7 +43,8 @@ public class BookMarksContentProvider extends ContentProvider {
             ,BookMarksDataBaseHelper.BOOKMARK_DATE
             ,BookMarksDataBaseHelper.BOOKMARK_UPDATING_STATE
             ,BookMarksDataBaseHelper.BOOKMARK_FAILED
-            ,BookMarksDataBaseHelper.BOOKMARK_DEFAULT};
+            ,BookMarksDataBaseHelper.BOOKMARK_DEFAULT
+            ,BookMarksDataBaseHelper.BOOKMARK_WEATHER_ICON};
 
     // used for the UriMacher
     private static final int BOOKMARKS = 10;

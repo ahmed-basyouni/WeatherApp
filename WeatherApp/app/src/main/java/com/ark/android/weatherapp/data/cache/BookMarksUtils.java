@@ -42,6 +42,7 @@ public class BookMarksUtils {
         weathers.add(new Weather());
         weatherObj.setWeather(weathers);
         weatherObj.getWeather().get(0).setWeatherTitle(cursor.getString(cursor.getColumnIndex(BookMarksDataBaseHelper.WEATHER_TITLE)));
+        weatherObj.getWeather().get(0).setIcon(cursor.getString(cursor.getColumnIndex(BookMarksDataBaseHelper.BOOKMARK_WEATHER_ICON)));
         weatherObj.setWeatherInfoObject(new WeatherInfoObject());
         weatherObj.getWeatherInfoObject().setTemp(cursor.getDouble(cursor.getColumnIndex(BookMarksDataBaseHelper.BOOKMARK_TEMP)));
         weatherObj.getWeatherInfoObject().setTempMax(cursor.getDouble(cursor.getColumnIndex(BookMarksDataBaseHelper.BOOKMARK_MAX_TEMP)));
@@ -74,8 +75,10 @@ public class BookMarksUtils {
         contentValues.put(BookMarksDataBaseHelper.DATE_INSERTED, bookMarksObject.getCreatedTime());
         if (bookMarksObject.getWeatherObj() != null) {
             contentValues.put(BookMarksDataBaseHelper.BOOKMARK_GEO, bookMarksObject.getWeatherObj().getName());
-            if (bookMarksObject.getWeatherObj().getWeather().size() > 0)
+            if (bookMarksObject.getWeatherObj().getWeather().size() > 0) {
                 contentValues.put(BookMarksDataBaseHelper.WEATHER_TITLE, bookMarksObject.getWeatherObj().getWeather().get(0).getWeatherTitle());
+                contentValues.put(BookMarksDataBaseHelper.BOOKMARK_WEATHER_ICON, bookMarksObject.getWeatherObj().getWeather().get(0).getIcon());
+            }
             if (bookMarksObject.getWeatherObj().getWeatherInfoObject() != null) {
                 contentValues.put(BookMarksDataBaseHelper.BOOKMARK_TEMP, bookMarksObject.getWeatherObj().getWeatherInfoObject().getTemp());
                 contentValues.put(BookMarksDataBaseHelper.BOOKMARK_MAX_TEMP, bookMarksObject.getWeatherObj().getWeatherInfoObject().getTempMax());

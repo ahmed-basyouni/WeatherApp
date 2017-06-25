@@ -1,6 +1,7 @@
 package com.ark.android.weatherapp.ui.fragment;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
@@ -65,6 +66,11 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
         initUI(rootView);
         initToolBar();
         return rootView;
+    }
+
+    @Override
+    public Activity getActivityContext() {
+        return getActivity();
     }
 
     private void initToolBar() {
@@ -140,6 +146,18 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @Override
+    public void showDeleteIcon() {
+        if(isAddShown)
+            changeIconAnimation();
+    }
+
+    @Override
+    public void showAddIcon() {
+        if(!isAddShown)
+            changeIconAnimation();
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST) {
             if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -165,7 +183,10 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.openMap:
-                openPlacePickerFragment();
+                if(isAddShown)
+                    openPlacePickerFragment();
+                else
+                    homePresenter.deleteBookmark();
                 break;
         }
     }
@@ -176,7 +197,7 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
                 .addToBackStack(null).commit();
     }
 
-    public void fadeAnimation(){
+    public void changeIconAnimation(){
         Animation fadeIn = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_out_animatin);
         addBtn.startAnimation(fadeIn);
 
@@ -188,7 +209,7 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
             public void onAnimationEnd(Animation animation) {
                 Animation fadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_in_anim);
                 if(isAddShown)
-                    addBtn.setImageResource(R.drawable.ic_bookmark_border_white_24dp);
+                    addBtn.setImageResource(R.drawable.ic_delete_white_24dp);
                 else
                     addBtn.setImageResource(R.drawable.ic_add_white_24dp);
                 addBtn.startAnimation(fadeOut);

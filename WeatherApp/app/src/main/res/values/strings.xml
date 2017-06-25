@@ -19,4 +19,10 @@
     <string name="sky">Sky</string>
     <string name="clock">Clock</string>
     <string name="hour">Hour Hand</string>
+    <string name="image_transition_name">banner</string>
+    <string name="tempTransitionName">tempTransition</string>
+    <string name="tempWithUnit">%s\u00B0</string>
+    <string name="rainVolume">%.2f mm</string>
+    <string name="windSpeed">%.2f m/s</string>
+    <string name="humidity">%d \%</string>
 </resources>

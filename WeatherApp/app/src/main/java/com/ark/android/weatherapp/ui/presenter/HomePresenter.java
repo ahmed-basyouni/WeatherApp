@@ -1,6 +1,9 @@
 package com.ark.android.weatherapp.ui.presenter;
 
+import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -12,24 +15,30 @@ import com.ark.android.weatherapp.manager.BookmarkManager;
 import com.ark.android.weatherapp.mvpContract.BookmarksListContract;
 import com.ark.android.weatherapp.service.GPSTracker;
 import com.ark.android.weatherapp.ui.adapter.BookmarkAdapter;
+import com.ark.android.weatherapp.ui.fragment.DetailsFragment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A presenter class for {@link com.ark.android.weatherapp.ui.fragment.HomeFragment}
  * Created by Ark on 6/25/2017.
  */
 
-public class HomePresenter implements BookmarksListContract.IBookmarksContractPresenter {
+public class HomePresenter implements BookmarksListContract.IBookmarksContractPresenter, BookmarksListContract.IBookmarkAdapterPresenter {
 
     private final BookmarksListContract.IBookmarksContractView bookmarkView;
     private final BookmarkManager bookmarkManager;
     private BookmarkAdapter bookmarkAdapter;
     private GPSTracker gpsTracker;
+    private Map<Integer, BookMarksObject> bookmarksToRemove = new HashMap<>();
 
     /**
      * on initialization try to get the user location if not defined before
+     *
      * @param iBookmarksContractView
      */
     public HomePresenter(BookmarksListContract.IBookmarksContractView iBookmarksContractView) {
@@ -42,26 +51,27 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
     public void onLoaderFinish(Cursor cursor) {
         if (cursor != null && cursor.getCount() > 0) {
             List<BookMarksObject> bookmarks = getBookmarksFromCursor(cursor);
-            if(bookmarkAdapter == null) {
-                bookmarkAdapter = new BookmarkAdapter(bookmarks, bookmarkView.getContext());
-                bookmarkView.getBookmarksList().setLayoutManager(new LinearLayoutManager(bookmarkView.getContext()));
+            if (bookmarkAdapter == null) {
+                bookmarkAdapter = new BookmarkAdapter(bookmarks, this);
+                bookmarkView.getBookmarksList().setLayoutManager(new LinearLayoutManager(bookmarkView.getActivityContext()));
                 bookmarkView.getBookmarksList().setAdapter(bookmarkAdapter);
-            }else{
+            } else {
                 bookmarkAdapter.updateList(bookmarks);
                 bookmarkAdapter.notifyDataSetChanged();
             }
-            bookmarkView.getBookmarksList().setOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    bookmarkAdapter.setScrollingDown(dy > 0);
-                    super.onScrolled(recyclerView, dx, dy);
-                }
-            });
+//            bookmarkView.getBookmarksList().setOnScrollListener(new RecyclerView.OnScrollListener() {
+//                @Override
+//                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//                    bookmarkAdapter.setScrollingDown(dy > 0);
+//                    super.onScrolled(recyclerView, dx, dy);
+//                }
+//            });
         }
     }
 
     /**
      * get {@link BookMarksObject} list from cursor
+     *
      * @param cursor
      * @return
      */
@@ -76,8 +86,18 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
     }
 
     @Override
-    public void deleteBookmark(BookMarksObject bookMarksObject) {
+    public void deleteBookmark() {
+        if (!bookmarksToRemove.isEmpty()) {
+            Iterator<Map.Entry<Integer, BookMarksObject>> iter = bookmarksToRemove.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<Integer, BookMarksObject> entry = iter.next();
+                bookmarkManager.deleteBookmark(entry.getValue());
+                bookmarkAdapter.notifyItemRemoved(entry.getKey());
+                iter.remove();
+            }
 
+        }
+        bookmarkView.showAddIcon();
     }
 
     /**
@@ -86,7 +106,7 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
      */
     @Override
     public void getCurrentLocation() {
-        if(bookmarkView.isLocationPermissionGranted())
+        if (bookmarkView.isLocationPermissionGranted())
             onPermissionGranted();
         else
             bookmarkView.askForPermission();
@@ -94,17 +114,18 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
 
     @Override
     public void onPermissionGranted() {
-        if(gpsTracker == null)
-            gpsTracker = new GPSTracker(bookmarkView.getContext());
+        if (gpsTracker == null)
+            gpsTracker = new GPSTracker(bookmarkView.getActivityContext());
         checkUserLocation(gpsTracker);
     }
 
     /**
      * check user location
+     *
      * @param gpsTracker
      */
     private void checkUserLocation(GPSTracker gpsTracker) {
-        if(!bookmarkManager.isDefaultAvailable()) {
+        if (!bookmarkManager.isDefaultAvailable()) {
             double latitude = 0;
             double longitude = 0;
             if (gpsTracker.canGetLocation()) {
@@ -134,7 +155,30 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
 
     @Override
     public void onFragmentPaused() {
-        if(gpsTracker != null)
+        if (gpsTracker != null)
             gpsTracker.stopUsingGPS();
+    }
+
+    @Override
+    public Activity getActivityContext() {
+        return bookmarkView.getActivityContext();
+    }
+
+    @Override
+    public void selectBookmarkAtPosition(int position, boolean checked) {
+        if (checked)
+            bookmarksToRemove.put(position, bookmarkAdapter.getBookmarks().get(position));
+        else
+            bookmarksToRemove.remove(position);
+
+        if (!bookmarksToRemove.isEmpty())
+            bookmarkView.showDeleteIcon();
+        else
+            bookmarkView.showAddIcon();
+    }
+
+    @Override
+    public boolean isItemAtPositionSelected(int position) {
+        return bookmarksToRemove.get(position) != null;
     }
 }

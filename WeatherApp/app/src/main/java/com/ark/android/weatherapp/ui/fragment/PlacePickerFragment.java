@@ -119,7 +119,7 @@ public class PlacePickerFragment extends Fragment implements OnMapReadyCallback,
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if(mapView != null)
-            mapView.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 
     private void permissionGranted() {

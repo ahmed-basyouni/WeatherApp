@@ -3,6 +3,7 @@ package com.ark.android.weatherapp.ui.adapter;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Point;
+import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.Display;
@@ -12,17 +13,19 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.ark.android.weatherapp.R;
 import com.ark.android.weatherapp.data.model.BookMarksObject;
 import com.ark.android.weatherapp.manager.BookmarkManager;
+import com.ark.android.weatherapp.mvpContract.BookmarksListContract;
+import com.ark.android.weatherapp.ui.fragment.DetailsFragment;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,35 +34,25 @@ import java.util.List;
  * Created by Ark on 6/24/2017.
  */
 
-public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.BookmarkViewHolder>{
+public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.BookmarkViewHolder> implements BookmarksListContract.IBookmarkAdapterView{
 
     private final Context context;
     private final int width;
     private final int height;
     private final BookmarkManager bookmarkManager;
+    private final BookmarksListContract.IBookmarkAdapterPresenter bookmarkAdapterPresenter;
     private List<BookMarksObject> bookmarks;
 
-    private boolean scrollingDown;
-
-    private HashMap<Integer, Boolean> itemsScrolled = new HashMap<>();
-
-    public BookmarkAdapter(List<BookMarksObject> bookmarks, Context context){
+    public BookmarkAdapter(List<BookMarksObject> bookmarks, BookmarksListContract.IBookmarkAdapterPresenter iBookmarkAdapterPresenter){
         this.bookmarks = bookmarks;
-        this.context = context;
+        this.bookmarkAdapterPresenter = iBookmarkAdapterPresenter;
+        this.context = iBookmarkAdapterPresenter.getActivityContext();
         Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         width = size.x;
         height = size.y;
         bookmarkManager = new BookmarkManager();
-        initAnimationsItems();
-    }
-
-    private void initAnimationsItems() {
-        for (int x = 0; x < bookmarks.size(); x++) {
-
-            itemsScrolled.put(x, false);
-        }
     }
 
     @Override
@@ -69,15 +62,9 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
     }
 
     @Override
-    public void onBindViewHolder(BookmarkViewHolder holder, int position) {
-        if (scrollingDown && itemsScrolled != null && !itemsScrolled.isEmpty() && itemsScrolled.get(position) != null && !itemsScrolled.get(position)) {
+    public void onBindViewHolder(final BookmarkViewHolder holder, final int position) {
 
-            Animation animation = AnimationUtils.loadAnimation(context, R.anim.up_from_bottom);
-            holder.itemView.startAnimation(animation);
-            itemsScrolled.put(position, true);
-
-        }
-        final BookMarksObject bookMarksObject = bookmarks.get(position);
+        final BookMarksObject bookMarksObject = bookmarks.get(holder.getAdapterPosition());
         holder.bookmarkTitle.setText(bookMarksObject.getTitle());
         CardView cardView = (CardView) holder.timeImage.getParent();
         RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) cardView.getLayoutParams();
@@ -109,7 +96,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
                 holder.weatherTitle.setText(bookMarksObject.getWeatherObj().getWeather().get(0).getWeatherTitle());
 
             holder.bookmarkGeoAddress.setText(bookMarksObject.getGeoAddress());
-            holder.bookmarkDegree.setText(String.valueOf(bookMarksObject.getWeatherObj().getWeatherInfoObject().getTemp()) + "\u00B0");
+            holder.bookmarkDegree.setText(String.format(bookmarkAdapterPresenter.getActivityContext().getString(R.string.tempWithUnit),String.valueOf(bookMarksObject.getWeatherObj().getWeatherInfoObject().getTemp())));
             holder.bookmarkGeoProgress.setVisibility(View.GONE);
             holder.retry.setVisibility(View.GONE);
         }
@@ -125,10 +112,40 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
             }
         });
 
-        if(bookMarksObject.isDefault())
+        if(bookMarksObject.isDefault()) {
             holder.defaultMark.setVisibility(View.VISIBLE);
-        else
+            holder.checkBoxContainer.setVisibility(View.GONE);
+        }else {
             holder.defaultMark.setVisibility(View.GONE);
+            holder.checkBoxContainer.setVisibility(View.VISIBLE);
+        }
+
+        if(bookmarkAdapterPresenter.isItemAtPositionSelected(holder.getAdapterPosition()))
+            holder.deleteCheckBox.setChecked(true);
+        else
+            holder.deleteCheckBox.setChecked(false);
+
+        holder.deleteCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bookmarkAdapterPresenter.selectBookmarkAtPosition(holder.getAdapterPosition(), holder.deleteCheckBox.isChecked());
+            }
+        });
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(DetailsFragment.BOOKMARK_OBJ,getBookmarks().get(holder.getAdapterPosition()));
+                bundle.putInt(DetailsFragment.IMAGE_RES, getImageForWeather(bookMarksObject.getWeatherObj().getWeather().get(0).getWeatherTitle()));
+                DetailsFragment detailsFragment = new DetailsFragment();
+                detailsFragment.setArguments(bundle);
+                bookmarkAdapterPresenter.getActivityContext().getFragmentManager()
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .add(R.id.fragmentContainer, detailsFragment).commit();
+            }
+        });
     }
 
     private int getImageForWeather(String weatherTitle) {
@@ -167,6 +184,8 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
         ImageButton retry;
         ImageView timeImage;
         ImageView defaultMark;
+        LinearLayout checkBoxContainer;
+        CheckBox deleteCheckBox;
 
         BookmarkViewHolder(View itemView) {
             super(itemView);
@@ -178,10 +197,13 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
             timeImage = (ImageView) itemView.findViewById(R.id.timeImage);
             defaultMark = (ImageView) itemView.findViewById(R.id.defaultBookmark);
             weatherTitle = (TextView) itemView.findViewById(R.id.weatherTitle);
+            checkBoxContainer = (LinearLayout) itemView.findViewById(R.id.checkBoxContainer);
+            deleteCheckBox = (CheckBox) itemView.findViewById(R.id.deleteCheckBox);
         }
     }
 
-    public void setScrollingDown(boolean scrollingDown) {
-        this.scrollingDown = scrollingDown;
+    @Override
+    public List<BookMarksObject> getBookmarks() {
+        return bookmarks;
     }
 }

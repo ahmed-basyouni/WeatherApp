@@ -32,6 +32,7 @@ public class BookMarksDataBaseHelper extends SQLiteOpenHelper{
     static final String BOOKMARK_FAILED = "bookmark_failed";
     static final String BOOKMARK_DATE = "bookmarkDate";
     public static final String BOOKMARK_DEFAULT = "bookmarkDefault";
+    static final String BOOKMARK_WEATHER_ICON = "weatherIcon";
 
     private static final String DATABASE_CREATE = "create table "
             + BOOKMARKS_TABLE + "( " + BOOKMARK_ID
@@ -40,6 +41,7 @@ public class BookMarksDataBaseHelper extends SQLiteOpenHelper{
             + LONGITUDE + " text not null, "
             + LATITUDE + " text not null, "
             + WEATHER_TITLE + " text , "
+            + BOOKMARK_WEATHER_ICON + " text , "
             + BOOKMARK_TEMP + " integer, "
             + BOOKMARK_MAX_TEMP + " integer, "
             + BOOKMARK_MIN_TEMP + " integer, "

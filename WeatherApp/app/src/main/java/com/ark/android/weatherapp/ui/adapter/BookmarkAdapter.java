@@ -136,7 +136,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                bundle.putSerializable(DetailsFragment.BOOKMARK_OBJ,getBookmarks().get(holder.getAdapterPosition()));
+                bundle.putParcelable(DetailsFragment.BOOKMARK_OBJ,getBookmarks().get(holder.getAdapterPosition()));
                 bundle.putInt(DetailsFragment.IMAGE_RES, getImageForWeather(bookMarksObject.getWeatherObj().getWeather().get(0).getWeatherTitle()));
                 DetailsFragment detailsFragment = new DetailsFragment();
                 detailsFragment.setArguments(bundle);

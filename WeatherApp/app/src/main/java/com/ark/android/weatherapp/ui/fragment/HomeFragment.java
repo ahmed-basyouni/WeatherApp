@@ -56,7 +56,7 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
         super.onCreate(savedInstanceState);
         LoaderManager lm = getLoaderManager();
         lm.initLoader(LOADER_ID, null, this);
-        homePresenter = new HomePresenter(this);
+        homePresenter = new HomePresenter(this, savedInstanceState != null);
     }
 
     @Nullable
@@ -219,5 +219,11 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
             public void onAnimationRepeat(Animation animation) {
             }
         });
+    }
+
+    @Override
+    public void closeApp() {
+        getActivity().finish();
+        System.exit(0);
     }
 }

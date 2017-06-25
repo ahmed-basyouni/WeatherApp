@@ -1,33 +1,32 @@
 package com.ark.android.weatherapp.ui.fragment;
 
 import android.app.Fragment;
-import android.content.res.Resources;
-import android.graphics.Color;
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.ark.android.weatherapp.R;
-import com.ark.android.weatherapp.data.model.BookMarksObject;
-
-import java.text.DecimalFormat;
+import com.ark.android.weatherapp.mvpContract.DetailsScreenContract;
+import com.ark.android.weatherapp.ui.presenter.DetailsScreenPresenter;
 
 /**
  *
  * Created by Ark on 6/25/2017.
  */
 
-public class DetailsFragment extends Fragment {
+public class DetailsFragment extends Fragment implements DetailsScreenContract.IDetailsScreenView{
 
     public static final String BOOKMARK_OBJ = "bookmarkObj";
     public static final String IMAGE_RES = "imageRes";
@@ -42,44 +41,24 @@ public class DetailsFragment extends Fragment {
     private TextView rain;
     private TextView wind;
     private TextView humidity;
-    private BookMarksObject bookmarkObj;
-    private int imageRes;
+    private RecyclerView forecastList;
+    private ProgressBar progressView;
+    private TextView errorView;
+    private DetailsScreenPresenter detailsScreenPresenter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.details_fragment, container, false);
-        getObjectsFromBundle();
         initUI(rootView);
         setToolBar();
-        setUIData();
+        detailsScreenPresenter = new DetailsScreenPresenter(this);
+        detailsScreenPresenter.getDataFromBundle(getArguments());
+        if(savedInstanceState == null)
+            detailsScreenPresenter.getForecastForBookmarkObj();
+        else
+            detailsScreenPresenter.onRestoreBundle(savedInstanceState);
         return rootView;
-    }
-
-    private void setUIData() {
-        tempDegree.setText(String.format(getString(R.string.tempWithUnit),String.valueOf(bookmarkObj.getWeatherObj().getWeatherInfoObject().getTemp())));
-        maxTemp.setText(String.format(getString(R.string.tempWithUnit),String.valueOf(bookmarkObj.getWeatherObj().getWeatherInfoObject().getTempMax())));
-        minTemp.setText(String.format(getString(R.string.tempWithUnit),String.valueOf(bookmarkObj.getWeatherObj().getWeatherInfoObject().getTempMin())));
-        if(bookmarkObj.getWeatherObj() != null && !bookmarkObj.getWeatherObj().getWeather().isEmpty())
-           weatherTitle.setText(bookmarkObj.getWeatherObj().getWeather().get(0).getWeatherTitle());
-        rain.setText(String.format(getString(R.string.rainVolume),bookmarkObj.getWeatherObj().getRain().getRainVolume()));
-        wind.setText(String.format(getString(R.string.rainVolume),bookmarkObj.getWeatherObj().getWind().getSpeed()));
-        humidity.setText(String.format(getString(R.string.humidity), bookmarkObj.getWeatherObj().getWeatherInfoObject().getHumidity()));
-        collapseingToolbar.setExpandedTitleColor(Color.parseColor("#00FFFFFF"));
-        bookmarkBanner.setImageResource(imageRes);
-        weatherIcon.setImageDrawable(getDrawableForName(bookmarkObj.getWeatherObj().getWeather().get(0).getIcon()));
-    }
-
-    private Drawable getDrawableForName(String name){
-        Resources resources = getActivity().getResources();
-        final int resourceId = resources.getIdentifier("weather"+name, "drawable",
-                getActivity().getPackageName());
-        return ContextCompat.getDrawable(getActivity(), resourceId);
-    }
-
-    private void getObjectsFromBundle() {
-        bookmarkObj = (BookMarksObject) getArguments().getSerializable(BOOKMARK_OBJ);
-        imageRes = getArguments().getInt(IMAGE_RES);
     }
 
     private void initUI(View rootView) {
@@ -94,6 +73,9 @@ public class DetailsFragment extends Fragment {
         rain = (TextView) rootView.findViewById(R.id.rain);
         wind = (TextView) rootView.findViewById(R.id.wind);
         humidity = (TextView) rootView.findViewById(R.id.hum);
+        forecastList = (RecyclerView) rootView.findViewById(R.id.forecastList);
+        progressView = (ProgressBar) rootView.findViewById(R.id.progressBar);
+        errorView = (TextView) rootView.findViewById(R.id.errorView);
     }
 
     private void setToolBar() {
@@ -102,8 +84,6 @@ public class DetailsFragment extends Fragment {
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
 
         if(actionBar != null){
-
-            actionBar.setTitle(bookmarkObj.getGeoAddress());
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
         }
@@ -114,5 +94,101 @@ public class DetailsFragment extends Fragment {
                 getActivity().onBackPressed();
             }
         });
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        detailsScreenPresenter.onSaveInstance(outState);
+        super.onSaveInstanceState(outState);
+    }
+
+
+
+    @Override
+    public RecyclerView getForecastList() {
+        return forecastList;
+    }
+
+    @Override
+    public Context getActivityContext() {
+        return getActivity();
+    }
+
+    @Override
+    public void setTemp(String temp) {
+        tempDegree.setText(temp);
+    }
+
+    @Override
+    public void setWeatherTitle(String title) {
+        weatherTitle.setText(title);
+    }
+
+    @Override
+    public void setMaxTemp(String maxTempString) {
+        maxTemp.setText(maxTempString);
+    }
+
+    @Override
+    public void setMinTemp(String minTempString) {
+        minTemp.setText(minTempString);
+    }
+
+    @Override
+    public void setRainVolume(String rainVolumeString) {
+        rain.setText(rainVolumeString);
+    }
+
+    @Override
+    public void setWindSpeed(String windSpeed) {
+        wind.setText(windSpeed);
+    }
+
+    @Override
+    public void setHumidity(String humidityString) {
+        humidity.setText(humidityString);
+    }
+
+    @Override
+    public void setWeatherIcon(Drawable imageRes) {
+        weatherIcon.setImageDrawable(imageRes);
+    }
+
+    @Override
+    public void showErrorMsg(String error) {
+        errorView.setVisibility(View.VISIBLE);
+        errorView.setText(error);
+    }
+
+    @Override
+    public void hideErrorMsg() {
+        errorView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showProgressBar() {
+        progressView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgressBar() {
+        progressView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void setToolbarTitle(String title) {
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if(actionBar != null)
+            actionBar.setTitle(title);
+    }
+
+    @Override
+    public void setweatherImage(int imageRes) {
+        bookmarkBanner.setImageResource(imageRes);
+    }
+
+    @Override
+    public void setExpandedTitleColor(int color) {
+        collapseingToolbar.setExpandedTitleColor(color);
     }
 }

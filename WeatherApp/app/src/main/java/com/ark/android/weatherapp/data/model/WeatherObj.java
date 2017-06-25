@@ -1,9 +1,11 @@
 package com.ark.android.weatherapp.data.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -11,7 +13,7 @@ import java.util.List;
  * Created by Ark on 6/24/2017.
  */
 
-public class WeatherObj extends BaseModel implements Serializable {
+public class WeatherObj extends BaseModel implements Parcelable {
 
     @SerializedName("coord")
     @Expose
@@ -34,6 +36,17 @@ public class WeatherObj extends BaseModel implements Serializable {
     @SerializedName("name")
     @Expose
     private String name;
+    @SerializedName("dt_txt")
+    @Expose
+    private String dateText;
+
+    public String getDateText() {
+        return dateText;
+    }
+
+    public void setDateText(String dateText) {
+        this.dateText = dateText;
+    }
 
     public CoordObj getCoord() {
         return coord;
@@ -91,4 +104,47 @@ public class WeatherObj extends BaseModel implements Serializable {
         this.name = name;
     }
 
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(this.coord, flags);
+        dest.writeTypedList(this.weather);
+        dest.writeParcelable(this.weatherInfoObject, flags);
+        dest.writeParcelable(this.wind, flags);
+        dest.writeParcelable(this.rain, flags);
+        dest.writeLong(this.weatherDate);
+        dest.writeString(this.name);
+        dest.writeString(this.dateText);
+    }
+
+    public WeatherObj() {
+    }
+
+    protected WeatherObj(Parcel in) {
+        this.coord = in.readParcelable(CoordObj.class.getClassLoader());
+        this.weather = in.createTypedArrayList(Weather.CREATOR);
+        this.weatherInfoObject = in.readParcelable(WeatherInfoObject.class.getClassLoader());
+        this.wind = in.readParcelable(Wind.class.getClassLoader());
+        this.rain = in.readParcelable(RainObject.class.getClassLoader());
+        this.weatherDate = in.readLong();
+        this.name = in.readString();
+        this.dateText = in.readString();
+    }
+
+    public static final Creator<WeatherObj> CREATOR = new Creator<WeatherObj>() {
+        @Override
+        public WeatherObj createFromParcel(Parcel source) {
+            return new WeatherObj(source);
+        }
+
+        @Override
+        public WeatherObj[] newArray(int size) {
+            return new WeatherObj[size];
+        }
+    };
 }

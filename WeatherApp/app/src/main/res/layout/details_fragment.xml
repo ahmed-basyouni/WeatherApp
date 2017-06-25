@@ -167,29 +167,34 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.widget.NestedScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/forecastList"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingTop="24dp">
+            android:layout_height="match_parent" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/verylarge"
+            android:id="@+id/errorView"/>
 
-            <TextView
-                android:id="@+id/ImageDesc"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui Sed a euismod dui " />
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:visibility="gone"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/verylarge"
+            android:layout_height="wrap_content" />
 
-
-        </LinearLayout>
-
-    </android.support.v4.widget.NestedScrollView>
-
-
+    </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

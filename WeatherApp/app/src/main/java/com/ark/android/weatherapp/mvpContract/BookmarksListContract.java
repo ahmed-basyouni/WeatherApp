@@ -28,6 +28,7 @@ public interface BookmarksListContract {
         void locationObtainFail();
         void showDeleteIcon();
         void showAddIcon();
+        void closeApp();
     }
 
     interface IBookmarksContractPresenter{

@@ -41,10 +41,11 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
      *
      * @param iBookmarksContractView
      */
-    public HomePresenter(BookmarksListContract.IBookmarksContractView iBookmarksContractView) {
+    public HomePresenter(BookmarksListContract.IBookmarksContractView iBookmarksContractView, boolean resumed) {
         this.bookmarkView = iBookmarksContractView;
         this.bookmarkManager = new BookmarkManager();
-        getCurrentLocation();
+        if(!resumed)
+            getCurrentLocation();
     }
 
     @Override
@@ -59,13 +60,6 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
                 bookmarkAdapter.updateList(bookmarks);
                 bookmarkAdapter.notifyDataSetChanged();
             }
-//            bookmarkView.getBookmarksList().setOnScrollListener(new RecyclerView.OnScrollListener() {
-//                @Override
-//                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                    bookmarkAdapter.setScrollingDown(dy > 0);
-//                    super.onScrolled(recyclerView, dx, dy);
-//                }
-//            });
         }
     }
 
@@ -92,12 +86,16 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
             while (iter.hasNext()) {
                 Map.Entry<Integer, BookMarksObject> entry = iter.next();
                 bookmarkManager.deleteBookmark(entry.getValue());
+                bookmarkAdapter.getBookmarks().remove(entry.getKey().intValue());
                 bookmarkAdapter.notifyItemRemoved(entry.getKey());
                 iter.remove();
             }
 
         }
         bookmarkView.showAddIcon();
+
+        if(bookmarkAdapter.getBookmarks().isEmpty())
+            bookmarkView.closeApp();
     }
 
     /**

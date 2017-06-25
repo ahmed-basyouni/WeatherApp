@@ -13,4 +13,10 @@
     <string name="defaultCity">London</string>
     <string name="locationFail">Sorry couldn\'t obtain your location</string>
     <string name="userLocation">Current location</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="sun">Sun</string>
+    <string name="grass">Grass</string>
+    <string name="sky">Sky</string>
+    <string name="clock">Clock</string>
+    <string name="hour">Hour Hand</string>
 </resources>

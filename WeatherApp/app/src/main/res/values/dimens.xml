@@ -7,4 +7,5 @@
     <dimen name="textSizeLarge">20sp</dimen>
     <dimen name="progressContainerMinWidth">60dp</dimen>
     <dimen name="verylarge">40sp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

@@ -2,6 +2,7 @@ package com.ark.android.weatherapp.ui.presenter;
 
 import android.database.Cursor;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.ark.android.weatherapp.R;
 import com.ark.android.weatherapp.WeatherApp;
@@ -11,7 +12,6 @@ import com.ark.android.weatherapp.manager.BookmarkManager;
 import com.ark.android.weatherapp.mvpContract.BookmarksListContract;
 import com.ark.android.weatherapp.service.GPSTracker;
 import com.ark.android.weatherapp.ui.adapter.BookmarkAdapter;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +50,13 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
                 bookmarkAdapter.updateList(bookmarks);
                 bookmarkAdapter.notifyDataSetChanged();
             }
+            bookmarkView.getBookmarksList().setOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    bookmarkAdapter.setScrollingDown(dy > 0);
+                    super.onScrolled(recyclerView, dx, dy);
+                }
+            });
         }
     }
 

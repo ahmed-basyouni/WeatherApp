@@ -1,6 +1,7 @@
 package com.ark.android.weatherapp.ui.adapter;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -20,6 +23,7 @@ import com.ark.android.weatherapp.manager.BookmarkManager;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -35,6 +39,10 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
     private final BookmarkManager bookmarkManager;
     private List<BookMarksObject> bookmarks;
 
+    private boolean scrollingDown;
+
+    private HashMap<Integer, Boolean> itemsScrolled = new HashMap<>();
+
     public BookmarkAdapter(List<BookMarksObject> bookmarks, Context context){
         this.bookmarks = bookmarks;
         this.context = context;
@@ -44,6 +52,14 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
         width = size.x;
         height = size.y;
         bookmarkManager = new BookmarkManager();
+        initAnimationsItems();
+    }
+
+    private void initAnimationsItems() {
+        for (int x = 0; x < bookmarks.size(); x++) {
+
+            itemsScrolled.put(x, false);
+        }
     }
 
     @Override
@@ -54,11 +70,22 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
 
     @Override
     public void onBindViewHolder(BookmarkViewHolder holder, int position) {
+        if (scrollingDown && itemsScrolled != null && !itemsScrolled.isEmpty() && itemsScrolled.get(position) != null && !itemsScrolled.get(position)) {
+
+            Animation animation = AnimationUtils.loadAnimation(context, R.anim.up_from_bottom);
+            holder.itemView.startAnimation(animation);
+            itemsScrolled.put(position, true);
+
+        }
         final BookMarksObject bookMarksObject = bookmarks.get(position);
         holder.bookmarkTitle.setText(bookMarksObject.getTitle());
         CardView cardView = (CardView) holder.timeImage.getParent();
         RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) cardView.getLayoutParams();
-        params.height = height / 3;
+        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+            params.height = height / 3;
+        else if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+            params.height = (int)(height/1.5);
+
         if(bookMarksObject.isUpdating()){
             holder.bookmarkGeoProgress.setVisibility(View.VISIBLE);
             holder.bookmarkGeoAddress.setVisibility(View.GONE);
@@ -152,5 +179,9 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
             defaultMark = (ImageView) itemView.findViewById(R.id.defaultBookmark);
             weatherTitle = (TextView) itemView.findViewById(R.id.weatherTitle);
         }
+    }
+
+    public void setScrollingDown(boolean scrollingDown) {
+        this.scrollingDown = scrollingDown;
     }
 }

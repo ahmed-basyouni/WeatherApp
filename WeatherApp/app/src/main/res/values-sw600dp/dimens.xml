@@ -1,24 +1,9 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="si_default_text_size">14sp</dimen>
-    <dimen name="si_default_radius_max">24dp</dimen>
-    <dimen name="si_default_radius_min">8dp</dimen>
-    <dimen name="fab_elevation">6dp</dimen>
-    <dimen name="fab_press_translation_z">12dp</dimen>
-    <dimen name="cardView_margin">16dp</dimen>
-    <dimen name="smallPadding">10dp</dimen>
     <dimen name="textSizeMedium">20sp</dimen>
     <dimen name="textSizeLarge">24sp</dimen>
-    <dimen name="default_elevation">6dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="progressBarDimen">25dp</dimen>
-    <dimen name="doubleCardHeight">200dp</dimen>
-    <dimen name="settingCardHeight">140dp</dimen>
-    <dimen name="changeImageContainerHeight">250dp</dimen>
-    <dimen name="large_margin">40dp</dimen>
-    <dimen name="smallCardHeight">80dp</dimen>
     <bool name="isTab">true</bool>
 
 </resources>

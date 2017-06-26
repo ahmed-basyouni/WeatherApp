@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,16 +14,12 @@ import com.ark.android.weatherapp.data.cache.BookMarksUtils;
 import com.ark.android.weatherapp.data.exception.AppException;
 import com.ark.android.weatherapp.data.model.BookMarksObject;
 import com.ark.android.weatherapp.data.model.ForcastObj;
-import com.ark.android.weatherapp.manager.BookmarkManager;
 import com.ark.android.weatherapp.manager.ForecastManager;
 import com.ark.android.weatherapp.mvpContract.DetailsScreenContract;
 import com.ark.android.weatherapp.ui.adapter.ForecastAdapter;
 import com.ark.android.weatherapp.ui.fragment.DetailsFragment;
 import com.ark.android.weatherapp.utils.TempUtils;
 import com.ark.android.weatherapp.utils.WeatherImageUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  *

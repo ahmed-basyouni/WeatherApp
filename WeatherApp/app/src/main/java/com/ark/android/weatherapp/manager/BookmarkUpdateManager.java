@@ -3,7 +3,6 @@ package com.ark.android.weatherapp.manager;
 import com.ark.android.weatherapp.data.exception.AppException;
 import com.ark.android.weatherapp.data.model.BookMarksObject;
 import com.ark.android.weatherapp.data.model.WeatherObj;
-import com.ark.android.weatherapp.data.network.NetworkListener;
 
 import java.util.Locale;
 

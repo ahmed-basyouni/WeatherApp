@@ -25,7 +25,7 @@ import java.util.List;
 public class BookMarksUtils {
 
     public static final String IS_ASCENDING_ORDER = "isAscending";
-    public static String IS_Fahrenheit = "isFahrenheit";
+    public final static String IS_Fahrenheit = "isFahrenheit";
 
     /**
      * pass a {@link Cursor} and get {@link BookMarksObject}

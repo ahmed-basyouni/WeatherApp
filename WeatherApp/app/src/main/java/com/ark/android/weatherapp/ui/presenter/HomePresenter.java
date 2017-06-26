@@ -1,7 +1,6 @@
 package com.ark.android.weatherapp.ui.presenter;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -9,8 +8,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import com.ark.android.weatherapp.R;
 import com.ark.android.weatherapp.WeatherApp;
@@ -41,7 +38,8 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
     private final BookmarkManager bookmarkManager;
     private BookmarkAdapter bookmarkAdapter;
     private GPSTracker gpsTracker;
-    private Map<Integer, BookMarksObject> bookmarksToRemove = new HashMap<>();
+    private final Map<Integer, BookMarksObject> bookmarksToRemove = new HashMap<>();
+    private int selectedItem = -1;
 
     /**
      * on initialization try to get the user location if not defined before
@@ -123,17 +121,21 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
         bookmarkView.showAddIcon();
 
         if (bookmarkView.getActivityContext().getResources().getBoolean(R.bool.isTab) && !bookmarkAdapter.getBookmarks().isEmpty()) {
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(DetailsFragment.BOOKMARK_OBJ, bookmarkAdapter.getBookmarks().get(0));
-            bookmarkView.openDetailsForBookmark(bundle);
-            bookmarkView.getBookmarksList().smoothScrollToPosition(0);
+            opeDetailsScreenForPosition(0);
         }
 
         if (bookmarkAdapter.getBookmarks().isEmpty())
             bookmarkView.closeApp();
     }
 
-    private Handler handler = new Handler() { // handler for commiting fragment after data is loaded
+    private void opeDetailsScreenForPosition(int i) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(DetailsFragment.BOOKMARK_OBJ, bookmarkAdapter.getBookmarks().get(i));
+        bookmarkView.openDetailsForBookmark(bundle);
+        bookmarkView.getBookmarksList().smoothScrollToPosition(0);
+    }
+
+    private final Handler handler = new Handler() { // handler for commiting fragment after data is loaded
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == 2) {
@@ -235,11 +237,20 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
     }
 
     @Override
+    public void didSelectItemAtPosition(int adapterPosition) {
+        selectedItem = adapterPosition;
+    }
+
+    @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(BookMarksUtils.IS_Fahrenheit)) {
             if (bookmarkAdapter != null) {
                 bookmarkAdapter.checkFahrenhiet();
                 bookmarkAdapter.notifyDataSetChanged();
+            }
+            if(selectedItem != -1 && bookmarkView.getActivityContext().getResources().getBoolean(R.bool.isTab)){
+                opeDetailsScreenForPosition(selectedItem);
+                selectedItem = -1;
             }
         } else if (key.equals(BookMarksUtils.IS_ASCENDING_ORDER)) {
             bookmarkView.restartLoader();

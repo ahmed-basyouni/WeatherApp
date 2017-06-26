@@ -25,7 +25,7 @@ import java.util.concurrent.Executor;
 public class WeatherAppDataTask<T extends BaseModel> extends AsyncTask<String, Void, Pair<AppException, T>> {
 
     private final NetworkListener<T> networkListener;
-    private Class<T> mClass;
+    private final Class<T> mClass;
 
     public WeatherAppDataTask(NetworkListener<T> networkListener, Class<T> clazz){
         this.mClass = clazz;

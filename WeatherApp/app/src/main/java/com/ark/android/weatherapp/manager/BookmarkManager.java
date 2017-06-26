@@ -56,7 +56,10 @@ public class BookmarkManager extends BaseManager<WeatherObj>
     public void addBookmarkObject(BookMarksObject bookMarksObject) {
         ContentValues contentValues = BookMarksUtils.getContentValueFromBookMark(bookMarksObject);
         Uri uri = WeatherApp.getInstance().getContentResolver().insert(BookMarksContentProvider.CONTENT_URI, contentValues);
-        long id = Long.valueOf(uri.getLastPathSegment());
+        long id = 0;
+        if (uri != null) {
+            id = Long.valueOf(uri.getLastPathSegment());
+        }
         bookMarksObject.setId(id);
         updateBookmarkObjectData(bookMarksObject);
     }

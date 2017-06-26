@@ -1,8 +1,6 @@
 package com.ark.android.weatherapp.mvpContract;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -19,11 +17,8 @@ import java.util.List;
 public interface BookmarksListContract {
 
     interface IBookmarksContractView{
-        void showErrorMsg(String msg);
-        void hideErrorMsg();
         RecyclerView getBookmarksList();
         Activity getActivityContext();
-        boolean isTabMode();
         boolean isLocationPermissionGranted();
         void askForPermission();
         void locationObtainFail();
@@ -60,5 +55,6 @@ public interface BookmarksListContract {
         Activity getActivityContext();
         void selectBookmarkAtPosition(int position, boolean checked);
         boolean isItemAtPositionSelected(int position);
+        void didSelectItemAtPosition(int adapterPosition);
     }
 }

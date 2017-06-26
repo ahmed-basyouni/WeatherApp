@@ -1,7 +1,6 @@
 package com.ark.android.weatherapp.data.cache;
 
 import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -27,7 +26,7 @@ import java.util.HashSet;
 public class BookMarksContentProvider extends ContentProvider {
 
     //list of projections
-    public static String[] AVAILABLE_COLUMNS = { BookMarksDataBaseHelper.BOOKMARK_ID,
+    private final static String[] AVAILABLE_COLUMNS = { BookMarksDataBaseHelper.BOOKMARK_ID,
             BookMarksDataBaseHelper.BOOKMARK_NAME
             ,BookMarksDataBaseHelper.BOOKMARK_GEO
             ,BookMarksDataBaseHelper.LONGITUDE
@@ -119,7 +118,7 @@ public class BookMarksContentProvider extends ContentProvider {
     public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
         int uriType = sURIMatcher.match(uri);
         SQLiteDatabase sqlDB = dataBaseHelper.getWritableDatabase();
-        long id = 0;
+        long id;
         switch (uriType) {
             case BOOKMARKS:
                 id = sqlDB.insert(BookMarksDataBaseHelper.BOOKMARKS_TABLE, null, contentValues);
@@ -135,7 +134,7 @@ public class BookMarksContentProvider extends ContentProvider {
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         int uriType = sURIMatcher.match(uri);
         SQLiteDatabase sqlDB = dataBaseHelper.getWritableDatabase();
-        int rowsDeleted = 0;
+        int rowsDeleted;
         switch (uriType) {
             case BOOKMARKS:
                 rowsDeleted = sqlDB.delete(BookMarksDataBaseHelper.BOOKMARKS_TABLE, selection,
@@ -169,7 +168,7 @@ public class BookMarksContentProvider extends ContentProvider {
 
         int uriType = sURIMatcher.match(uri);
         SQLiteDatabase sqlDB = dataBaseHelper.getWritableDatabase();
-        int rowsUpdated = 0;
+        int rowsUpdated;
         switch (uriType) {
             case BOOKMARKS:
                 rowsUpdated = sqlDB.update(BookMarksDataBaseHelper.BOOKMARKS_TABLE,
@@ -208,9 +207,9 @@ public class BookMarksContentProvider extends ContentProvider {
     private void checkColumns(String[] projection) {
 
         if (projection != null) {
-            HashSet<String> requestedColumns = new HashSet<String>(
+            HashSet<String> requestedColumns = new HashSet<>(
                     Arrays.asList(projection));
-            HashSet<String> availableColumns = new HashSet<String>(
+            HashSet<String> availableColumns = new HashSet<>(
                     Arrays.asList(AVAILABLE_COLUMNS));
             // check if all columns which are requested are available
             if (!availableColumns.containsAll(requestedColumns)) {

@@ -2,7 +2,6 @@ package com.ark.android.weatherapp.service;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,9 +10,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -21,36 +18,24 @@ import android.util.Log;
  * service that track user location
  * Created by Ark on 25/06/2017.
  */
-public class GPSTracker extends Service implements LocationListener {
+public class GPSTracker implements LocationListener {
 
 
     private final Context mContext;
 
-    // flag for GPS status
-    boolean isGPSEnabled = false;
+    private boolean canGetLocation = false;
 
-    // flag for network status
-    boolean isNetworkEnabled = false;
-
-    boolean canGetLocation = false;
-
-    Location location; // location
-    double latitude; // latitude
-    double longitude; // longitude
+    private Location location; // location
+    private double latitude; // latitude
+    private double longitude; // longitude
     // The minimum distance to change Updates in meters
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
 
     // The minimum time between updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 60; // 1 minute
 
     // Declaring a Location Manager
-    protected LocationManager locationManager;
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+    private LocationManager locationManager;
 
     public GPSTracker(Context mContext) {
         this.mContext = mContext;
@@ -77,17 +62,17 @@ public class GPSTracker extends Service implements LocationListener {
 
     }
 
-    public Location getLocation() {
+    private Location getLocation() {
         try {
             locationManager = (LocationManager) mContext
-                    .getSystemService(LOCATION_SERVICE);
+                    .getSystemService(Context.LOCATION_SERVICE);
 
             // getting GPS status
-            isGPSEnabled = locationManager
+            boolean isGPSEnabled = locationManager
                     .isProviderEnabled(LocationManager.GPS_PROVIDER);
 
             // getting network status
-            isNetworkEnabled = locationManager
+            boolean isNetworkEnabled = locationManager
                     .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
             if (!isGPSEnabled && !isNetworkEnabled) {

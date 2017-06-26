@@ -7,8 +7,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
-
 /**
  *
  * Created by Ark on 6/24/2017.

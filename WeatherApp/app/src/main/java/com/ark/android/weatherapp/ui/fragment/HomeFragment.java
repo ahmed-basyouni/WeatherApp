@@ -7,7 +7,6 @@ import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
@@ -21,7 +20,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -116,23 +114,8 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @Override
-    public void showErrorMsg(String msg) {
-
-    }
-
-    @Override
-    public void hideErrorMsg() {
-
-    }
-
-    @Override
     public RecyclerView getBookmarksList() {
         return bookmarksList;
-    }
-
-    @Override
-    public boolean isTabMode() {
-        return false;
     }
 
     @Override

@@ -12,8 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -32,8 +30,6 @@ import com.ark.android.weatherapp.utils.TempUtils;
 import com.ark.android.weatherapp.utils.WeatherImageUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  *
@@ -43,7 +39,6 @@ import java.util.List;
 public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.BookmarkViewHolder> implements BookmarksListContract.IBookmarkAdapterView{
 
     private final Context context;
-    private final int width;
     private final int height;
     private final BookmarkManager bookmarkManager;
     private final BookmarksListContract.IBookmarkAdapterPresenter bookmarkAdapterPresenter;
@@ -58,7 +53,6 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
         Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        width = size.x;
         height = size.y;
         bookmarkManager = new BookmarkManager();
         checkFahrenhiet();
@@ -158,6 +152,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
                 bundle.putParcelable(DetailsFragment.BOOKMARK_OBJ,getBookmarks().get(holder.getAdapterPosition()));
                 DetailsFragment detailsFragment = new DetailsFragment();
                 detailsFragment.setArguments(bundle);
+                bookmarkAdapterPresenter.didSelectItemAtPosition(holder.getAdapterPosition());
                 if(isTab){
                     bookmarkAdapterPresenter.getActivityContext().getFragmentManager()
                             .beginTransaction()
@@ -183,16 +178,16 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
 
     class BookmarkViewHolder extends RecyclerView.ViewHolder{
 
-        TextView bookmarkTitle;
-        TextView bookmarkGeoAddress;
-        TextView weatherTitle;
-        ProgressBar bookmarkGeoProgress;
-        TextView bookmarkDegree;
-        ImageButton retry;
-        ImageView timeImage;
-        ImageView defaultMark;
-        LinearLayout checkBoxContainer;
-        CheckBox deleteCheckBox;
+        final TextView bookmarkTitle;
+        final TextView bookmarkGeoAddress;
+        final TextView weatherTitle;
+        final ProgressBar bookmarkGeoProgress;
+        final TextView bookmarkDegree;
+        final ImageButton retry;
+        final ImageView timeImage;
+        final ImageView defaultMark;
+        final LinearLayout checkBoxContainer;
+        final CheckBox deleteCheckBox;
 
         BookmarkViewHolder(View itemView) {
             super(itemView);

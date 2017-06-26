@@ -14,7 +14,7 @@ import java.util.List;
 
 public class FragmentUtils {
 
-    private List<WeakReference<Fragment>> fragList = new ArrayList<WeakReference<Fragment>>();
+    private final List<WeakReference<Fragment>> fragList = new ArrayList<>();
 
     public void onAttachFragment (Fragment fragment) {
         fragList.add(new WeakReference<>(fragment));
@@ -22,7 +22,7 @@ public class FragmentUtils {
 
 
     private List<Fragment> getActiveFragments() {
-        ArrayList<Fragment> ret = new ArrayList<Fragment>();
+        ArrayList<Fragment> ret = new ArrayList<>();
         for(WeakReference<Fragment> ref : fragList) {
             Fragment f = ref.get();
             if(f != null) {

@@ -15,10 +15,6 @@ import com.ark.android.weatherapp.mvpContract.ActivityFragmentContract;
 import com.ark.android.weatherapp.ui.fragment.HomeFragment;
 import com.ark.android.weatherapp.utils.FragmentUtils;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Main App activity which add the {@link HomeFragment} and contain two helper methods for Permission Request
  */

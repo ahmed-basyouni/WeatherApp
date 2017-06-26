@@ -15,7 +15,7 @@ import java.net.URL;
 public class NetworkDispatcher {
 
     public static String callWebService(String url) throws IOException {
-        HttpURLConnection urlConnection = null;
+        HttpURLConnection urlConnection;
         URL uri = new URL(url);
         urlConnection = (HttpURLConnection) uri.openConnection();
 

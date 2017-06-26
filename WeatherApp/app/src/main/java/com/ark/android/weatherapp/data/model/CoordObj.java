@@ -6,13 +6,12 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
-
 /**
+ *
  * Created by Ark on 6/24/2017.
  */
 
-public class CoordObj implements Parcelable {
+class CoordObj implements Parcelable {
 
     @SerializedName("lon")
     @Expose

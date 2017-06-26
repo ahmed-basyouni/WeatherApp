@@ -31,7 +31,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
     private final Context context;
     private final ForcastObj forecastObj;
     private final boolean isFaherhiet;
-    private SimpleDateFormat simpleDateFormat;
+    private final SimpleDateFormat simpleDateFormat;
 
     public ForecastAdapter(Context context, ForcastObj forcastObj){
         this.context = context;
@@ -83,12 +83,12 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
 
     class ForecastViewHolder extends RecyclerView.ViewHolder{
 
-        TextView date;
-        TextView time;
-        TextView weatherInfo;
-        TextView weatherDescription;
+        final TextView date;
+        final TextView time;
+        final TextView weatherInfo;
+        final TextView weatherDescription;
 
-        public ForecastViewHolder(View itemView) {
+        ForecastViewHolder(View itemView) {
             super(itemView);
             date = (TextView) itemView.findViewById(R.id.date);
             time = (TextView) itemView.findViewById(R.id.time);

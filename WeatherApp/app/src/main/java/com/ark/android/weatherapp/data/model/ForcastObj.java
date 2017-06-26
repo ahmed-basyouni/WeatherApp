@@ -6,11 +6,11 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
  * Created by Ark on 6/24/2017.
  */
 
@@ -55,7 +55,7 @@ public class ForcastObj extends BaseModel implements Parcelable {
     }
 
     protected ForcastObj(Parcel in) {
-        this.weatherObjs = new ArrayList<WeatherObj>();
+        this.weatherObjs = new ArrayList<>();
         in.readList(this.weatherObjs, WeatherObj.class.getClassLoader());
         this.city = in.readParcelable(City.class.getClassLoader());
     }

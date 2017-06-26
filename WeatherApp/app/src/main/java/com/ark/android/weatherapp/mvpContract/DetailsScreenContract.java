@@ -1,6 +1,5 @@
 package com.ark.android.weatherapp.mvpContract;
 
-import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;

@@ -1,10 +1,7 @@
 package com.ark.android.weatherapp.threading;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Pair;
 
-import com.ark.android.weatherapp.BuildConfig;
 import com.ark.android.weatherapp.data.exception.AppException;
 import com.ark.android.weatherapp.data.model.WeatherObj;
 import com.ark.android.weatherapp.data.network.NetworkListener;
@@ -14,11 +11,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.robolectric.RobolectricTestRunner;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.*;
 
 /**
  *

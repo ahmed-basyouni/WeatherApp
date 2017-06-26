@@ -3,7 +3,6 @@ package com.ark.android.weatherapp.manager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
-import android.support.annotation.VisibleForTesting;
 
 import com.ark.android.weatherapp.BuildConfig;
 import com.ark.android.weatherapp.R;
@@ -22,7 +21,7 @@ import com.ark.android.weatherapp.threading.WeatherAppDataTask;
 
 public class BaseManager<T extends BaseModel> {
 
-    private Class<T> mClass;
+    private final Class<T> mClass;
 
     BaseManager(Class<T> clazz){
         this.mClass = clazz;

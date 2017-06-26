@@ -1,7 +1,5 @@
 package com.ark.android.weatherapp.mvpContract;
 
-import android.app.Fragment;
-
 /**
  *
  * Created by Ark on 6/26/2017.

@@ -61,6 +61,7 @@
         android:layout_marginTop="?attr/actionBarSize">
 
         <LinearLayout
+            android:baselineAligned="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
@@ -70,21 +71,13 @@
             android:layout_weight="1"
             android:id="@+id/masterViewMain"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            tools:context="com.ark.movieapp.ui.activity.HomeActivity">
-
-
-        </FrameLayout>
+            android:layout_height="match_parent"/>
 
         <FrameLayout
             android:layout_weight="1"
             android:id="@+id/masterViewDetails"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            tools:context="com.ark.movieapp.ui.activity.HomeActivity">
-
-
-        </FrameLayout>
+            android:layout_height="match_parent"/>
 
         </LinearLayout>
     </FrameLayout>

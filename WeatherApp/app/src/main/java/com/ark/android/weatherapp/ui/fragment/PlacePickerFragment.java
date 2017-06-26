@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.ark.android.weatherapp.R;
+import com.ark.android.weatherapp.mvpContract.ActivityFragmentContract;
 import com.ark.android.weatherapp.ui.activity.MainActivity;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -36,15 +37,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * Created by Ark on 6/24/2017.
  */
 
-public class PlacePickerFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener {
+public class PlacePickerFragment extends Fragment implements OnMapReadyCallback
+        , View.OnClickListener
+        , ActivityFragmentContract.FragmentToolBarSetupInterface{
 
     private static final int PERMISSION_REQUEST = 234;
     private static final int ADD_BOOKMARK_DIALOG_REQUEST = 43;
     GoogleMap mMap;
     private MapView mapView;
     private LatLng currentLatLng;
-    private Dialog bookmarkNameDialog;
-    private Toolbar toolbar;
 
     @Nullable
     @Override
@@ -52,7 +53,6 @@ public class PlacePickerFragment extends Fragment implements OnMapReadyCallback,
         View rootView = inflater.inflate(R.layout.place_picker_fragment, container, false);
 
         initUI(rootView);
-        setToolBar();
         setUpMap(savedInstanceState);
 
         return rootView;
@@ -64,30 +64,9 @@ public class PlacePickerFragment extends Fragment implements OnMapReadyCallback,
     }
 
     private void initUI(View rootView) {
-        toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
-        Button doneButton = (Button) rootView.findViewById(R.id.doneButton);
+        Button doneButton = (Button) getActivity().findViewById(R.id.doneButton);
         doneButton.setOnClickListener(this);
         mapView = (MapView) rootView.findViewById(R.id.mapV);
-    }
-
-    private void setToolBar() {
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-
-        if(actionBar != null){
-
-            actionBar.setTitle(getString(R.string.pick_location));
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
-        }
-
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().onBackPressed();
-            }
-        });
     }
 
     @Override
@@ -172,6 +151,7 @@ public class PlacePickerFragment extends Fragment implements OnMapReadyCallback,
         if (mapView != null)
             mapView.onResume();
         super.onResume();
+        setupToolBar();
     }
 
     public void showAddBookmarkDialog() {
@@ -188,7 +168,7 @@ public class PlacePickerFragment extends Fragment implements OnMapReadyCallback,
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == ADD_BOOKMARK_DIALOG_REQUEST && resultCode == Activity.RESULT_OK){
-            getFragmentManager().beginTransaction().remove(PlacePickerFragment.this).commit();
+            getFragmentManager().popBackStack();
         }
     }
 
@@ -201,5 +181,18 @@ public class PlacePickerFragment extends Fragment implements OnMapReadyCallback,
                 Toast.makeText(getActivity(), getString(R.string.no_location_provide), Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @Override
+    public void setupToolBar() {
+
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+
+        if(actionBar != null){
+            actionBar.setTitle(getString(R.string.pick_location));
+            ((ActivityFragmentContract.FragmentInteractionListener)getActivity()).showBackBtn(true);
+        }
+
+        ((ActivityFragmentContract.FragmentInteractionListener)getActivity()).changeToolbarButtonsVisibility(false, false, true);
     }
 }

@@ -2,6 +2,7 @@ package com.ark.android.weatherapp.mvpContract;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -29,6 +30,8 @@ public interface BookmarksListContract {
         void showDeleteIcon();
         void showAddIcon();
         void closeApp();
+        void restartLoader();
+        void openDetailsForBookmark(Bundle bundle);
     }
 
     interface IBookmarksContractPresenter{
@@ -37,6 +40,7 @@ public interface BookmarksListContract {
         void getCurrentLocation();
         void onPermissionGranted();
         void onFragmentPaused();
+        void onSaveInstance(Bundle outState);
     }
 
     interface IBookmarksContractModel{
@@ -49,6 +53,7 @@ public interface BookmarksListContract {
 
     interface IBookmarkAdapterView{
         List<BookMarksObject> getBookmarks();
+        void checkFahrenhiet();
     }
 
     interface IBookmarkAdapterPresenter{

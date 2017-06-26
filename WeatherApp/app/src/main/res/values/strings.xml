@@ -27,4 +27,15 @@
     <string name="humidity">%d %%</string>
     <string name="NA">N/A</string>
     <string name="minMax">%1$s\u00B0/%2$s\u00B0</string>
+    <string name="Celsius">Celsius</string>
+    <string name="Fahrenheit">Fahrenheit</string>
+    <string name="Temp">Temperature</string>
+    <string name="units">Units</string>
+    <string name="bookmarkSorting">Sorting</string>
+    <string name="bookmarkSort">Sort Bookmarks</string>
+    <string name="Ascending">Ascending</string>
+    <string name="descending">Descending</string>
+    <string name="about">About</string>
+    <string name="aboutApp">About App</string>
+    <string name="settings">Settings</string>
 </resources>

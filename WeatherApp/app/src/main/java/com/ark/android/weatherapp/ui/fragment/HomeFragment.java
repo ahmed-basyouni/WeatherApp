@@ -7,10 +7,12 @@ import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -31,6 +33,8 @@ import android.widget.Toast;
 import com.ark.android.weatherapp.R;
 import com.ark.android.weatherapp.data.cache.BookMarksContentProvider;
 import com.ark.android.weatherapp.data.cache.BookMarksDataBaseHelper;
+import com.ark.android.weatherapp.data.cache.BookMarksUtils;
+import com.ark.android.weatherapp.mvpContract.ActivityFragmentContract;
 import com.ark.android.weatherapp.mvpContract.BookmarksListContract;
 import com.ark.android.weatherapp.ui.activity.MainActivity;
 import com.ark.android.weatherapp.ui.presenter.HomePresenter;
@@ -40,11 +44,13 @@ import com.ark.android.weatherapp.ui.presenter.HomePresenter;
  * Created by Ark on 6/24/2017.
  */
 
-public class HomeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, BookmarksListContract.IBookmarksContractView, View.OnClickListener {
+public class HomeFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
+        , BookmarksListContract.IBookmarksContractView
+        , View.OnClickListener
+        , ActivityFragmentContract.FragmentToolBarSetupInterface {
 
     private final int LOADER_ID = 231;
     private final int PERMISSION_REQUEST = 234;
-    private Toolbar toolbar;
     private RecyclerView bookmarksList;
     private HomePresenter homePresenter;
     private ImageButton addBtn;
@@ -55,8 +61,13 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LoaderManager lm = getLoaderManager();
-        lm.initLoader(LOADER_ID, null, this);
-        homePresenter = new HomePresenter(this, savedInstanceState != null);
+        lm.initLoader(LOADER_ID, savedInstanceState, this);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        homePresenter.onSaveInstance(outState);
+        super.onSaveInstanceState(outState);
     }
 
     @Nullable
@@ -64,7 +75,7 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.bookmarks_list_fragment, container, false);
         initUI(rootView);
-        initToolBar();
+        homePresenter = new HomePresenter(this, savedInstanceState);
         return rootView;
     }
 
@@ -73,17 +84,11 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
         return getActivity();
     }
 
-    private void initToolBar() {
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        if(actionBar != null)
-            actionBar.setTitle(R.string.app_name);
-    }
-
     private void initUI(View rootView) {
-        toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
-        addBtn = (ImageButton) rootView.findViewById(R.id.openMap);
+        addBtn = (ImageButton) getActivity().findViewById(R.id.openMap);
         addBtn.setOnClickListener(this);
+        ImageButton settingBtn = (ImageButton) getActivity().findViewById(R.id.settingBtn);
+        settingBtn.setOnClickListener(this);
         bookmarksList = (RecyclerView) rootView.findViewById(R.id.bookmarkList);
     }
 
@@ -95,14 +100,15 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        boolean ascending = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(BookMarksUtils.IS_ASCENDING_ORDER, false);
         return new CursorLoader(getActivity(), BookMarksContentProvider.CONTENT_URI,
-                null, null, null,  BookMarksDataBaseHelper.BOOKMARK_DEFAULT + " DESC," + BookMarksDataBaseHelper.DATE_INSERTED + " DESC");
+                null, null, null, BookMarksDataBaseHelper.BOOKMARK_DEFAULT + " DESC," + BookMarksDataBaseHelper.DATE_INSERTED + (ascending ? " ASC" : " DESC"));
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(loader.getId() == LOADER_ID)
-             homePresenter.onLoaderFinish(data);
+        if (loader.getId() == LOADER_ID)
+            homePresenter.onLoaderFinish(data);
     }
 
     @Override
@@ -147,13 +153,13 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void showDeleteIcon() {
-        if(isAddShown)
+        if (isAddShown)
             changeIconAnimation();
     }
 
     @Override
     public void showAddIcon() {
-        if(!isAddShown)
+        if (!isAddShown)
             changeIconAnimation();
     }
 
@@ -164,14 +170,14 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
                 homePresenter.onPermissionGranted();
             } else if (!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
                 // Not all/any permission granted
-                ((MainActivity)getActivity()).showMessageOK(getString(R.string.locationDenied), null);
+                ((MainActivity) getActivity()).showMessageOK(getString(R.string.locationDenied), null);
             } else {
-                ((MainActivity)getActivity()).showMessageOKCancel(getString(R.string.allowLocation),
+                ((MainActivity) getActivity()).showMessageOKCancel(getString(R.string.allowLocation),
                         new DialogInterface.OnClickListener() {
                             @RequiresApi(api = Build.VERSION_CODES.M)
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                                         PERMISSION_REQUEST);
                             }
                         });
@@ -181,23 +187,30 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.openMap:
-                if(isAddShown)
+                if (isAddShown)
                     openPlacePickerFragment();
                 else
                     homePresenter.deleteBookmark();
                 break;
+            case R.id.settingBtn:
+                openSettingScreen();
+                break;
         }
+    }
+
+    private void openSettingScreen() {
+        getFragmentManager().beginTransaction().add(R.id.fragmentContainer, new SettingsFragment(), SettingsFragment.class.getSimpleName()).addToBackStack(SettingsFragment.class.getSimpleName()).commit();
     }
 
     private void openPlacePickerFragment() {
         getFragmentManager().beginTransaction()
-                .add(R.id.fragmentContainer, new PlacePickerFragment())
-                .addToBackStack(null).commit();
+                .add(R.id.fragmentContainer, new PlacePickerFragment(), PlacePickerFragment.class.getSimpleName())
+                .addToBackStack(PlacePickerFragment.class.getSimpleName()).commit();
     }
 
-    public void changeIconAnimation(){
+    public void changeIconAnimation() {
         Animation fadeIn = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_out_animatin);
         addBtn.startAnimation(fadeIn);
 
@@ -205,16 +218,18 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
             @Override
             public void onAnimationStart(Animation animation) {
             }
+
             @Override
             public void onAnimationEnd(Animation animation) {
                 Animation fadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.fade_in_anim);
-                if(isAddShown)
+                if (isAddShown)
                     addBtn.setImageResource(R.drawable.ic_delete_white_24dp);
                 else
                     addBtn.setImageResource(R.drawable.ic_add_white_24dp);
                 addBtn.startAnimation(fadeOut);
                 isAddShown = !isAddShown;
             }
+
             @Override
             public void onAnimationRepeat(Animation animation) {
             }
@@ -225,5 +240,37 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
     public void closeApp() {
         getActivity().finish();
         System.exit(0);
+    }
+
+    @Override
+    public void restartLoader() {
+        LoaderManager lm = getLoaderManager();
+        lm.restartLoader(LOADER_ID, null, this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setupToolBar();
+    }
+
+    @Override
+    public void setupToolBar() {
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+
+        if (actionBar != null) {
+            actionBar.setTitle(R.string.app_name);
+            ((ActivityFragmentContract.FragmentInteractionListener) getActivity()).showBackBtn(false);
+        }
+        ((ActivityFragmentContract.FragmentInteractionListener) getActivity()).changeToolbarButtonsVisibility(true, true, false);
+    }
+
+    @Override
+    public void openDetailsForBookmark(Bundle bundle) {
+        DetailsFragment detailsFragment = new DetailsFragment();
+        detailsFragment.setArguments(bundle);
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.masterViewDetails, detailsFragment).commit();
     }
 }

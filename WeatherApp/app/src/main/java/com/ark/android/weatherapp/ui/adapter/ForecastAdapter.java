@@ -2,6 +2,7 @@ package com.ark.android.weatherapp.ui.adapter;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,8 +10,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.ark.android.weatherapp.R;
+import com.ark.android.weatherapp.data.cache.BookMarksUtils;
 import com.ark.android.weatherapp.data.model.ForcastObj;
 import com.ark.android.weatherapp.data.model.WeatherObj;
+import com.ark.android.weatherapp.utils.TempUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,12 +30,14 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
 
     private final Context context;
     private final ForcastObj forecastObj;
+    private final boolean isFaherhiet;
     private SimpleDateFormat simpleDateFormat;
 
     public ForecastAdapter(Context context, ForcastObj forcastObj){
         this.context = context;
         this.forecastObj = forcastObj;
         simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        isFaherhiet = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(BookMarksUtils.IS_Fahrenheit, false);
     }
 
     @Override
@@ -59,7 +64,9 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
         }
 
         holder.weatherInfo.setCompoundDrawablesWithIntrinsicBounds(getDrawableId(weatherObj.getWeather().get(0).getIcon()), 0, 0, 0);
-        holder.weatherInfo.setText(String.format(context.getString(R.string.minMax), String.valueOf(weatherObj.getWeatherInfoObject().getTempMax()), String.valueOf(weatherObj.getWeatherInfoObject().getTempMin())));
+        double maxTemp = isFaherhiet ? TempUtils.convertToFahrenheit(weatherObj.getWeatherInfoObject().getTempMax()) : weatherObj.getWeatherInfoObject().getTempMax();
+        double minTemp = isFaherhiet ? TempUtils.convertToFahrenheit(weatherObj.getWeatherInfoObject().getTempMin()) : weatherObj.getWeatherInfoObject().getTempMin();
+        holder.weatherInfo.setText(String.format(context.getString(R.string.minMax), String.valueOf(maxTemp), String.valueOf(minTemp)));
 
     }
 

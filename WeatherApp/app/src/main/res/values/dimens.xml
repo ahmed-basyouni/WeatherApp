@@ -8,4 +8,5 @@
     <dimen name="progressContainerMinWidth">60dp</dimen>
     <dimen name="verylarge">40sp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <bool name="isTab">false</bool>
 </resources>

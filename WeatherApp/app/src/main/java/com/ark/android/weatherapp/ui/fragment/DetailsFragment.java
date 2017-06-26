@@ -1,7 +1,11 @@
 package com.ark.android.weatherapp.ui.fragment;
 
 import android.app.Fragment;
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,6 +22,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.ark.android.weatherapp.R;
+import com.ark.android.weatherapp.data.cache.BookMarksContentProvider;
+import com.ark.android.weatherapp.data.cache.BookMarksDataBaseHelper;
+import com.ark.android.weatherapp.mvpContract.ActivityFragmentContract;
 import com.ark.android.weatherapp.mvpContract.DetailsScreenContract;
 import com.ark.android.weatherapp.ui.presenter.DetailsScreenPresenter;
 
@@ -26,10 +33,11 @@ import com.ark.android.weatherapp.ui.presenter.DetailsScreenPresenter;
  * Created by Ark on 6/25/2017.
  */
 
-public class DetailsFragment extends Fragment implements DetailsScreenContract.IDetailsScreenView{
+public class DetailsFragment extends Fragment implements DetailsScreenContract.IDetailsScreenView, LoaderManager.LoaderCallbacks<Cursor>{
 
     public static final String BOOKMARK_OBJ = "bookmarkObj";
-    public static final String IMAGE_RES = "imageRes";
+    private static final int LOADER_ID = 23;
+
     private CollapsingToolbarLayout collapseingToolbar;
     private Toolbar toolbar;
     private ImageView bookmarkBanner;
@@ -51,13 +59,14 @@ public class DetailsFragment extends Fragment implements DetailsScreenContract.I
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.details_fragment, container, false);
         initUI(rootView);
-        setToolBar();
         detailsScreenPresenter = new DetailsScreenPresenter(this);
         detailsScreenPresenter.getDataFromBundle(getArguments());
-        if(savedInstanceState == null)
+
+        if(savedInstanceState == null) {
             detailsScreenPresenter.getForecastForBookmarkObj();
-        else
+        }else
             detailsScreenPresenter.onRestoreBundle(savedInstanceState);
+        getLoaderManager().initLoader(LOADER_ID, null, this);
         return rootView;
     }
 
@@ -79,21 +88,42 @@ public class DetailsFragment extends Fragment implements DetailsScreenContract.I
     }
 
     private void setToolBar() {
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if(!getResources().getBoolean(R.bool.isTab)) {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
-        if(actionBar != null){
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
-        }
+            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().onBackPressed();
+            ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+
+            if (actionBar != null) {
+                actionBar.setTitle(detailsScreenPresenter.getTitle());
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setHomeButtonEnabled(true);
             }
-        });
+
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getActivity().onBackPressed();
+                }
+            });
+        }else{
+            toolbar.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setToolBar();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if(!getResources().getBoolean(R.bool.isTab))
+            ((ActivityFragmentContract.FragmentInteractionListener)getActivity()).resetToolBar();
     }
 
     @Override
@@ -176,13 +206,6 @@ public class DetailsFragment extends Fragment implements DetailsScreenContract.I
     }
 
     @Override
-    public void setToolbarTitle(String title) {
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        if(actionBar != null)
-            actionBar.setTitle(title);
-    }
-
-    @Override
     public void setweatherImage(int imageRes) {
         bookmarkBanner.setImageResource(imageRes);
     }
@@ -190,5 +213,21 @@ public class DetailsFragment extends Fragment implements DetailsScreenContract.I
     @Override
     public void setExpandedTitleColor(int color) {
         collapseingToolbar.setExpandedTitleColor(color);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(getActivity(), BookMarksContentProvider.CONTENT_URI,null, BookMarksDataBaseHelper.BOOKMARK_ID + " = ?"
+                , new String[]{detailsScreenPresenter.getId()}, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        detailsScreenPresenter.getDataFromCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }

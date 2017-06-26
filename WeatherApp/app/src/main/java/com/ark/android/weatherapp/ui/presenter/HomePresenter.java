@@ -2,10 +2,15 @@ package com.ark.android.weatherapp.ui.presenter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.ark.android.weatherapp.R;
 import com.ark.android.weatherapp.WeatherApp;
@@ -28,8 +33,10 @@ import java.util.Map;
  * Created by Ark on 6/25/2017.
  */
 
-public class HomePresenter implements BookmarksListContract.IBookmarksContractPresenter, BookmarksListContract.IBookmarkAdapterPresenter {
+public class HomePresenter implements BookmarksListContract.IBookmarksContractPresenter, BookmarksListContract.IBookmarkAdapterPresenter, SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private static final String LIST_KEY = "bookmarkList";
+    private static final String SCROLL_OFFSET = "scrollOffset";
     private final BookmarksListContract.IBookmarksContractView bookmarkView;
     private final BookmarkManager bookmarkManager;
     private BookmarkAdapter bookmarkAdapter;
@@ -41,25 +48,46 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
      *
      * @param iBookmarksContractView
      */
-    public HomePresenter(BookmarksListContract.IBookmarksContractView iBookmarksContractView, boolean resumed) {
+    public HomePresenter(BookmarksListContract.IBookmarksContractView iBookmarksContractView, Bundle bundle) {
         this.bookmarkView = iBookmarksContractView;
         this.bookmarkManager = new BookmarkManager();
-        if(!resumed)
+        PreferenceManager.getDefaultSharedPreferences(bookmarkView.getActivityContext()).registerOnSharedPreferenceChangeListener(this);
+        if (bundle == null)
             getCurrentLocation();
+        else
+            onRestoreState(bundle);
+    }
+
+    private void onRestoreState(Bundle bundle) {
+        ArrayList<BookMarksObject> bookmarks = bundle.getParcelableArrayList(LIST_KEY);
+        int scrollOffset = bundle.getInt(SCROLL_OFFSET);
+        markListAsForceUpdae(bookmarks);
+        bookmarkAdapter = new BookmarkAdapter(bookmarks, this);
+        bookmarkView.getBookmarksList().setLayoutManager(new LinearLayoutManager(bookmarkView.getActivityContext()));
+        bookmarkView.getBookmarksList().setAdapter(bookmarkAdapter);
+        bookmarkView.getBookmarksList().scrollTo(0, scrollOffset);
     }
 
     @Override
     public void onLoaderFinish(Cursor cursor) {
         if (cursor != null && cursor.getCount() > 0) {
-            List<BookMarksObject> bookmarks = getBookmarksFromCursor(cursor);
+            ArrayList<BookMarksObject> bookmarks = getBookmarksFromCursor(cursor);
             if (bookmarkAdapter == null) {
+                markListAsForceUpdae(bookmarks);
                 bookmarkAdapter = new BookmarkAdapter(bookmarks, this);
                 bookmarkView.getBookmarksList().setLayoutManager(new LinearLayoutManager(bookmarkView.getActivityContext()));
                 bookmarkView.getBookmarksList().setAdapter(bookmarkAdapter);
+                handler.sendEmptyMessage(2);
             } else {
                 bookmarkAdapter.updateList(bookmarks);
                 bookmarkAdapter.notifyDataSetChanged();
             }
+        }
+    }
+
+    private void markListAsForceUpdae(List<BookMarksObject> bookmarks) {
+        for (BookMarksObject bookMarksObject : bookmarks) {
+            bookMarksObject.setForceUpdate(true);
         }
     }
 
@@ -69,8 +97,8 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
      * @param cursor
      * @return
      */
-    private List<BookMarksObject> getBookmarksFromCursor(Cursor cursor) {
-        List<BookMarksObject> bookmarks = new ArrayList<>();
+    private ArrayList<BookMarksObject> getBookmarksFromCursor(Cursor cursor) {
+        ArrayList<BookMarksObject> bookmarks = new ArrayList<>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             bookmarks.add(BookMarksUtils.getBookMarkFromCursor(cursor));
@@ -94,9 +122,29 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
         }
         bookmarkView.showAddIcon();
 
-        if(bookmarkAdapter.getBookmarks().isEmpty())
+        if (bookmarkView.getActivityContext().getResources().getBoolean(R.bool.isTab) && !bookmarkAdapter.getBookmarks().isEmpty()) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(DetailsFragment.BOOKMARK_OBJ, bookmarkAdapter.getBookmarks().get(0));
+            bookmarkView.openDetailsForBookmark(bundle);
+            bookmarkView.getBookmarksList().smoothScrollToPosition(0);
+        }
+
+        if (bookmarkAdapter.getBookmarks().isEmpty())
             bookmarkView.closeApp();
     }
+
+    private Handler handler = new Handler() { // handler for commiting fragment after data is loaded
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 2) {
+                if (bookmarkView.getActivityContext().getResources().getBoolean(R.bool.isTab) && !bookmarkAdapter.getBookmarks().isEmpty()) {
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable(DetailsFragment.BOOKMARK_OBJ, bookmarkAdapter.getBookmarks().get(0));
+                    bookmarkView.openDetailsForBookmark(bundle);
+                }
+            }
+        }
+    };
 
     /**
      * first check {@link android.system.Os} and if it's Android M or above ask user for location permission
@@ -158,6 +206,12 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
     }
 
     @Override
+    public void onSaveInstance(Bundle outState) {
+        outState.putParcelableArrayList(LIST_KEY, bookmarkAdapter.getBookmarks());
+        outState.putInt(SCROLL_OFFSET, bookmarkView.getBookmarksList().computeVerticalScrollOffset());
+    }
+
+    @Override
     public Activity getActivityContext() {
         return bookmarkView.getActivityContext();
     }
@@ -178,5 +232,17 @@ public class HomePresenter implements BookmarksListContract.IBookmarksContractPr
     @Override
     public boolean isItemAtPositionSelected(int position) {
         return bookmarksToRemove.get(position) != null;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(BookMarksUtils.IS_Fahrenheit)) {
+            if (bookmarkAdapter != null) {
+                bookmarkAdapter.checkFahrenhiet();
+                bookmarkAdapter.notifyDataSetChanged();
+            }
+        } else if (key.equals(BookMarksUtils.IS_ASCENDING_ORDER)) {
+            bookmarkView.restartLoader();
+        }
     }
 }

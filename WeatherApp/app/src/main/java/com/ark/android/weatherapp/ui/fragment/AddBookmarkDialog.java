@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.ark.android.weatherapp.R;
+import com.ark.android.weatherapp.mvpContract.ActivityFragmentContract;
 import com.ark.android.weatherapp.mvpContract.AddBookmarkDialogContract;
 import com.ark.android.weatherapp.ui.presenter.AddBookmarkDialogPresenter;
 
@@ -21,7 +22,9 @@ import com.ark.android.weatherapp.ui.presenter.AddBookmarkDialogPresenter;
  * Created by Ark on 6/25/2017.
  */
 
-public class AddBookmarkDialog extends DialogFragment implements AddBookmarkDialogContract.IAddBookmarkView, View.OnClickListener {
+public class AddBookmarkDialog extends DialogFragment implements AddBookmarkDialogContract.IAddBookmarkView
+        , View.OnClickListener
+        , ActivityFragmentContract.FragmentToolBarSetupInterface{
 
     public static final String LONGITUDE = "longitude";
     public static final String LATITUDE = "latitude";
@@ -94,5 +97,10 @@ public class AddBookmarkDialog extends DialogFragment implements AddBookmarkDial
     @Override
     public void onClick(View v) {
         dialogPresenter.addBookmark();
+    }
+
+    @Override
+    public void setupToolBar() {
+
     }
 }

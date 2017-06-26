@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.Display;
@@ -21,11 +22,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.ark.android.weatherapp.R;
+import com.ark.android.weatherapp.data.cache.BookMarksUtils;
 import com.ark.android.weatherapp.data.model.BookMarksObject;
 import com.ark.android.weatherapp.manager.BookmarkManager;
+import com.ark.android.weatherapp.manager.BookmarkUpdateManager;
 import com.ark.android.weatherapp.mvpContract.BookmarksListContract;
 import com.ark.android.weatherapp.ui.fragment.DetailsFragment;
+import com.ark.android.weatherapp.utils.TempUtils;
+import com.ark.android.weatherapp.utils.WeatherImageUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,9 +47,11 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
     private final int height;
     private final BookmarkManager bookmarkManager;
     private final BookmarksListContract.IBookmarkAdapterPresenter bookmarkAdapterPresenter;
-    private List<BookMarksObject> bookmarks;
+    private final boolean isTab;
+    private boolean isFaherhiet;
+    private ArrayList<BookMarksObject> bookmarks;
 
-    public BookmarkAdapter(List<BookMarksObject> bookmarks, BookmarksListContract.IBookmarkAdapterPresenter iBookmarkAdapterPresenter){
+    public BookmarkAdapter(ArrayList<BookMarksObject> bookmarks, BookmarksListContract.IBookmarkAdapterPresenter iBookmarkAdapterPresenter){
         this.bookmarks = bookmarks;
         this.bookmarkAdapterPresenter = iBookmarkAdapterPresenter;
         this.context = iBookmarkAdapterPresenter.getActivityContext();
@@ -53,6 +61,8 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
         width = size.x;
         height = size.y;
         bookmarkManager = new BookmarkManager();
+        checkFahrenhiet();
+        isTab = context.getResources().getBoolean(R.bool.isTab);
     }
 
     @Override
@@ -68,10 +78,14 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
         holder.bookmarkTitle.setText(bookMarksObject.getTitle());
         CardView cardView = (CardView) holder.timeImage.getParent();
         RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) cardView.getLayoutParams();
-        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && !isTab)
             params.height = height / 3;
-        else if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+        else if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && isTab)
+            params.height = height / 4;
+        else if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !isTab)
             params.height = (int)(height/1.5);
+        else if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && isTab)
+            params.height = (int)(height/3);
 
         if(bookMarksObject.isUpdating()){
             holder.bookmarkGeoProgress.setVisibility(View.VISIBLE);
@@ -86,9 +100,12 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
             holder.bookmarkDegree.setVisibility(View.GONE);
             holder.retry.setVisibility(View.VISIBLE);
         }else if(!bookMarksObject.isUpdating() && !bookMarksObject.isUpdateFailed() && (bookMarksObject.getWeatherObj() == null
-                || bookMarksObject.getWeatherObj().getWeatherInfoObject() == null || bookMarksObject.getWeatherObj().getWeatherInfoObject().getTemp() == 0)){
+                || bookMarksObject.getWeatherObj().getWeatherInfoObject() == null
+                || bookMarksObject.getWeatherObj().getWeatherInfoObject().getTemp() == 0)){
             bookmarkManager.updateBookmarkObjectData(bookMarksObject);
         }else{
+            if(bookMarksObject.isForceUpdate())
+                new BookmarkUpdateManager().silentUpdate(bookMarksObject);
             holder.bookmarkGeoAddress.setVisibility(View.VISIBLE);
             holder.bookmarkDegree.setVisibility(View.VISIBLE);
             holder.weatherTitle.setVisibility(View.VISIBLE);
@@ -96,14 +113,16 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
                 holder.weatherTitle.setText(bookMarksObject.getWeatherObj().getWeather().get(0).getWeatherTitle());
 
             holder.bookmarkGeoAddress.setText(bookMarksObject.getGeoAddress());
-            holder.bookmarkDegree.setText(String.format(bookmarkAdapterPresenter.getActivityContext().getString(R.string.tempWithUnit),String.valueOf(bookMarksObject.getWeatherObj().getWeatherInfoObject().getTemp())));
+            holder.bookmarkDegree.setText(String.format(bookmarkAdapterPresenter.getActivityContext().getString(R.string.tempWithUnit),String.valueOf(
+                    isFaherhiet ? TempUtils.convertToFahrenheit(bookMarksObject.getWeatherObj().getWeatherInfoObject().getTemp())
+                    : bookMarksObject.getWeatherObj().getWeatherInfoObject().getTemp())));
             holder.bookmarkGeoProgress.setVisibility(View.GONE);
             holder.retry.setVisibility(View.GONE);
         }
 
         if(bookMarksObject.getWeatherObj() != null
                 && !bookMarksObject.getWeatherObj().getWeather().isEmpty() && bookMarksObject.getWeatherObj().getWeather().get(0).getWeatherTitle() != null)
-            holder.timeImage.setImageResource(getImageForWeather(bookMarksObject.getWeatherObj().getWeather().get(0).getWeatherTitle()));
+            holder.timeImage.setImageResource(WeatherImageUtils.getImageForWeather(bookMarksObject.getWeatherObj().getWeather().get(0).getWeatherTitle()));
 
         holder.retry.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,32 +156,20 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(DetailsFragment.BOOKMARK_OBJ,getBookmarks().get(holder.getAdapterPosition()));
-                bundle.putInt(DetailsFragment.IMAGE_RES, getImageForWeather(bookMarksObject.getWeatherObj().getWeather().get(0).getWeatherTitle()));
                 DetailsFragment detailsFragment = new DetailsFragment();
                 detailsFragment.setArguments(bundle);
-                bookmarkAdapterPresenter.getActivityContext().getFragmentManager()
-                        .beginTransaction()
-                        .addToBackStack(null)
-                        .add(R.id.fragmentContainer, detailsFragment).commit();
+                if(isTab){
+                    bookmarkAdapterPresenter.getActivityContext().getFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.masterViewDetails, detailsFragment).commit();
+                }else{
+                    bookmarkAdapterPresenter.getActivityContext().getFragmentManager()
+                            .beginTransaction()
+                            .addToBackStack(null)
+                            .add(R.id.fragmentContainer, detailsFragment).commit();
+                }
             }
         });
-    }
-
-    private int getImageForWeather(String weatherTitle) {
-        int drawableInt = R.drawable.day_clearsky;
-
-        if(weatherTitle.contains("Rain") || weatherTitle.contains("Extreme")
-                || weatherTitle.contains("Additional") || weatherTitle.contains("Thunderstorm") || weatherTitle.contains("Drizzle")){
-            drawableInt = R.drawable.day_rain;
-        } else if(weatherTitle.contains("Snow")){
-            drawableInt = R.drawable.day_snow;
-        }else if(weatherTitle.contains("Atmosphere")){
-            drawableInt = R.drawable.day_fog;
-        }else if(weatherTitle.contains("Clouds")){
-            drawableInt = R.drawable.day_cloudy;
-        }
-
-        return drawableInt;
     }
 
     @Override
@@ -170,7 +177,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
         return bookmarks.size();
     }
 
-    public void updateList(List<BookMarksObject> bookmarks) {
+    public void updateList(ArrayList<BookMarksObject> bookmarks) {
         this.bookmarks = bookmarks;
     }
 
@@ -203,7 +210,12 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
     }
 
     @Override
-    public List<BookMarksObject> getBookmarks() {
+    public ArrayList<BookMarksObject> getBookmarks() {
         return bookmarks;
+    }
+
+    @Override
+    public void checkFahrenhiet() {
+        isFaherhiet = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(BookMarksUtils.IS_Fahrenheit, false);
     }
 }

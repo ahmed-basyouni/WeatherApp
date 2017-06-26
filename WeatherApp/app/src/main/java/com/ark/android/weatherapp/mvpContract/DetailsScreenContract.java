@@ -2,6 +2,7 @@ package com.ark.android.weatherapp.mvpContract;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -32,7 +33,6 @@ public interface DetailsScreenContract {
         void hideErrorMsg();
         void showProgressBar();
         void hideProgressBar();
-        void setToolbarTitle(String title);
         void setweatherImage(int imageRes);
         void setExpandedTitleColor(int color);
     }
@@ -44,6 +44,9 @@ public interface DetailsScreenContract {
         void onRestoreBundle(Bundle bundle);
         void onSuccess(ForcastObj forcastObj);
         void onFail(AppException ex);
+        String getId();
+        void getDataFromCursor(Cursor data);
+        String getTitle();
     }
 
     interface IDetailsModel{

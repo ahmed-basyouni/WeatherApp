@@ -19,6 +19,15 @@ public class BookMarksObject extends BaseModel implements Parcelable {
     private boolean updateFailed;
     private boolean updating;
     private boolean isDefault;
+    private boolean forceUpdate;
+
+    public boolean isForceUpdate() {
+        return forceUpdate;
+    }
+
+    public void setForceUpdate(boolean forceUpdate) {
+        this.forceUpdate = forceUpdate;
+    }
 
     public boolean isDefault() {
         return isDefault;

@@ -127,10 +127,10 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
 
         if(bookMarksObject.isDefault()) {
             holder.defaultMark.setVisibility(View.VISIBLE);
-            holder.checkBoxContainer.setVisibility(View.GONE);
+            holder.deleteCheckBox.setVisibility(View.GONE);
         }else {
             holder.defaultMark.setVisibility(View.GONE);
-            holder.checkBoxContainer.setVisibility(View.VISIBLE);
+            holder.deleteCheckBox.setVisibility(View.VISIBLE);
         }
 
         if(bookmarkAdapterPresenter.isItemAtPositionSelected(holder.getAdapterPosition()))
@@ -186,7 +186,6 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
         final ImageButton retry;
         final ImageView timeImage;
         final ImageView defaultMark;
-        final LinearLayout checkBoxContainer;
         final CheckBox deleteCheckBox;
 
         BookmarkViewHolder(View itemView) {
@@ -199,7 +198,6 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
             timeImage = (ImageView) itemView.findViewById(R.id.timeImage);
             defaultMark = (ImageView) itemView.findViewById(R.id.defaultBookmark);
             weatherTitle = (TextView) itemView.findViewById(R.id.weatherTitle);
-            checkBoxContainer = (LinearLayout) itemView.findViewById(R.id.checkBoxContainer);
             deleteCheckBox = (CheckBox) itemView.findViewById(R.id.deleteCheckBox);
         }
     }

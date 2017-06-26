@@ -1,120 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/smallMargin"
+    android:background="@drawable/rounded_corner_bg"
+    android:orientation="vertical"
     card_view:cardBackgroundColor="@android:color/white"
-    card_view:cardElevation="3dp"
     card_view:cardCornerRadius="5dp"
-    android:background="@drawable/rounded_corner_bg">
+    card_view:cardElevation="3dp">
 
     <ImageView
         android:id="@+id/timeImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/day_clearsky"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop"
+        android:src="@drawable/day_clearsky" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <ImageView
+            android:id="@+id/defaultBookmark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/smallMargin"
             android:layout_alignParentRight="true"
+            android:layout_margin="@dimen/smallMargin"
             android:src="@drawable/ic_bookmark_border_white_24dp"
-            android:id="@+id/defaultBookmark"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/bookmarkTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/smallMargin"
-                tools:text="Title"
+                android:textColor="@android:color/white"
                 android:textSize="@dimen/textSizeLarge"
-                android:textColor="@android:color/white"/>
+                tools:text="Title" />
 
             <TextView
                 android:id="@+id/bookmarkGeoAddress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="GeoAddress"
                 android:layout_margin="@dimen/smallMargin"
+                android:layout_below="@id/bookmarkTitle"
+                android:textColor="@android:color/white"
                 android:textSize="@dimen/textSizeMedium"
-                android:textColor="@android:color/white"/>
+                tools:text="GeoAddress" />
 
-        </LinearLayout>
 
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleLarge"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center" />
 
         <ImageButton
+            android:id="@+id/retry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:id="@+id/retry"
-            android:src="@drawable/ic_refresh_black_24dp"
             android:background="@android:color/transparent"
-            android:visibility="gone"/>
+            android:src="@drawable/ic_refresh_black_24dp"
+            android:visibility="gone" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true">
 
             <TextView
+                android:id="@+id/degree"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/smallMargin"
-                android:id="@+id/degree"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/verylarge"
-                tools:text="30"/>
+                tools:text="30.32" />
 
             <TextView
+                android:id="@+id/weatherTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/weatherTitle"
-                android:textSize="@dimen/textSizeMedium"
+                tools:text="Clear"
+                android:gravity="center"
                 android:textColor="@android:color/white"
-                android:layout_margin="@dimen/smallMargin"/>
+                android:textSize="@dimen/textSizeMedium"
+                android:layout_below="@id/degree"
+                android:layout_alignRight="@id/degree"
+                android:layout_alignLeft="@id/degree" />
 
-        </LinearLayout>
 
-        <LinearLayout
+        <CheckBox
+            android:id="@+id/deleteCheckBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/checkBoxContainer"
             android:layout_alignParentBottom="true"
-            android:background="@color/elevated_info">
+            android:background="@color/elevated_info" />
 
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/deleteCheckBox"/>
-
-        </LinearLayout>
 
     </RelativeLayout>
 
